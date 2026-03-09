@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	FILENAME string = ".config/bloggator.json"
+	FILENAME string = ".gatorconfig.json"
 )
 
 type Config struct {
