@@ -1,11 +1,15 @@
 package state
 
-import "github.com/faxter/bloggator/internal/config"
+import (
+	"github.com/faxter/bloggator/internal/config"
+	"github.com/faxter/bloggator/internal/database"
+)
 
 type State struct {
+	Db     *database.Queries
 	Config *config.Config
 }
 
-func NewState(cfg *config.Config) *State {
-	return &State{Config: cfg}
+func NewState(db *database.Queries, cfg *config.Config) *State {
+	return &State{Db: db, Config: cfg}
 }
