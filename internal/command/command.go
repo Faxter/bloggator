@@ -30,6 +30,7 @@ func NewCommandSet() CommandSet {
 func (c *CommandSet) RegisterBuiltIns() {
 	c.register("login", handlerLogin)
 	c.register("register", handlerRegister)
+	c.register("reset", handlerReset)
 }
 
 func (c *CommandSet) Run(s *state.State, cmd Command) error {
@@ -77,4 +78,8 @@ func handlerRegister(s *state.State, cmd Command) error {
 	}
 	fmt.Println("user was created:", user)
 	return nil
+}
+
+func handlerReset(s *state.State, _ Command) error {
+	return s.Db.ResetUsers(context.Background())
 }
