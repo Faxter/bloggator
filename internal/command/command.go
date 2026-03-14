@@ -31,6 +31,7 @@ func (c *CommandSet) RegisterBuiltIns() {
 	c.register("login", handlerLogin)
 	c.register("register", handlerRegister)
 	c.register("reset", handlerReset)
+	c.register("users", handlerUsers)
 }
 
 func (c *CommandSet) Run(s *state.State, cmd Command) error {
@@ -82,4 +83,19 @@ func handlerRegister(s *state.State, cmd Command) error {
 
 func handlerReset(s *state.State, _ Command) error {
 	return s.Db.ResetUsers(context.Background())
+}
+
+func handlerUsers(s *state.State, _ Command) error {
+	users, err := s.Db.GetUsers(context.Background())
+	if err != nil {
+		return err
+	}
+	for _, user := range users {
+		line := fmt.Sprintf("* %s", user.Name)
+		if user.Name == s.Config.CurrentUser {
+			line += " (current)"
+		}
+		fmt.Printf("%s\n", line)
+	}
+	return nil
 }
