@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/faxter/bloggator/internal/database"
+	"github.com/faxter/bloggator/internal/rss"
 	"github.com/faxter/bloggator/internal/state"
 	"github.com/google/uuid"
 )
@@ -32,6 +33,7 @@ func (c *CommandSet) RegisterBuiltIns() {
 	c.register("register", handlerRegister)
 	c.register("reset", handlerReset)
 	c.register("users", handlerUsers)
+	c.register("agg", handlerAggregate)
 }
 
 func (c *CommandSet) Run(s *state.State, cmd Command) error {
@@ -97,5 +99,14 @@ func handlerUsers(s *state.State, _ Command) error {
 		}
 		fmt.Printf("%s\n", line)
 	}
+	return nil
+}
+
+func handlerAggregate(_ *state.State, _ Command) error {
+	feed, err := rss.FetchFeed(context.Background(), "https://www.wagslane.dev/index.xml")
+	if err != nil {
+		return err
+	}
+	fmt.Println(feed)
 	return nil
 }
