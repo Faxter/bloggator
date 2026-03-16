@@ -34,6 +34,7 @@ func (c *CommandSet) RegisterBuiltIns() {
 	c.register("reset", handlerReset)
 	c.register("users", handlerUsers)
 	c.register("agg", handlerAggregate)
+	c.register("addfeed", handlerAddFeed)
 }
 
 func (c *CommandSet) Run(s *state.State, cmd Command) error {
@@ -108,5 +109,28 @@ func handlerAggregate(_ *state.State, _ Command) error {
 		return err
 	}
 	fmt.Println(feed)
+	return nil
+}
+
+func handlerAddFeed(s *state.State, cmd Command) error {
+	if len(cmd.Args) == 0 {
+		return fmt.Errorf("command needs name of feed!")
+	}
+	if len(cmd.Args) == 1 {
+		return fmt.Errorf("command needs URL to the feed!")
+	}
+	feedname := cmd.Args[0]
+	url := cmd.Args[1]
+	user, err := s.Db.GetUser(context.Background(), s.Config.CurrentUser)
+	if err != nil {
+		return err
+	}
+	s.Db.AddFeed(context.Background(), database.AddFeedParams{
+		ID:        uuid.New(),
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		Name:      feedname,
+		Url:       url,
+		UserID:    user.ID})
 	return nil
 }
