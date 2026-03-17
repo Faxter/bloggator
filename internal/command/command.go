@@ -35,6 +35,7 @@ func (c *CommandSet) RegisterBuiltIns() {
 	c.register("users", handlerUsers)
 	c.register("agg", handlerAggregate)
 	c.register("addfeed", handlerAddFeed)
+	c.register("feeds", handlerFeeds)
 }
 
 func (c *CommandSet) Run(s *state.State, cmd Command) error {
@@ -132,5 +133,16 @@ func handlerAddFeed(s *state.State, cmd Command) error {
 		Name:      feedname,
 		Url:       url,
 		UserID:    user.ID})
+	return nil
+}
+
+func handlerFeeds(s *state.State, _ Command) error {
+	feeds, err := s.Db.GetFeeds(context.Background())
+	if err != nil {
+		return err
+	}
+	for _, feed := range feeds {
+		fmt.Printf("name: %s\turl: %s\tcreated by: %s\n", feed.Name, feed.Url, feed.Creator)
+	}
 	return nil
 }
