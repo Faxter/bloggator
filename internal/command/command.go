@@ -36,6 +36,8 @@ func (c *CommandSet) RegisterBuiltIns() {
 	c.register("agg", handlerAggregate)
 	c.register("addfeed", handlerAddFeed)
 	c.register("feeds", handlerFeeds)
+	c.register("follow", handlerFollow)
+	c.register("following", handlerFollows)
 }
 
 func (c *CommandSet) Run(s *state.State, cmd Command) error {
@@ -133,6 +135,10 @@ func handlerAddFeed(s *state.State, cmd Command) error {
 		Name:      feedname,
 		Url:       url,
 		UserID:    user.ID})
+	err = handlerFollow(s, Command{Name: "a", Args: []string{url}})
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -143,6 +149,48 @@ func handlerFeeds(s *state.State, _ Command) error {
 	}
 	for _, feed := range feeds {
 		fmt.Printf("name: %s\turl: %s\tcreated by: %s\n", feed.Name, feed.Url, feed.Creator)
+	}
+	return nil
+}
+
+func handlerFollow(s *state.State, cmd Command) error {
+	if len(cmd.Args) == 0 {
+		return fmt.Errorf("command needs url!")
+	}
+	url := cmd.Args[0]
+	currentUser, err := s.Db.GetUser(context.Background(), s.Config.CurrentUser)
+	if err != nil {
+		return err
+	}
+	feed, err := s.Db.GetFeed(context.Background(), url)
+	if err != nil {
+		return err
+	}
+	feedFollow, err := s.Db.CreateFeedFollow(context.Background(), database.CreateFeedFollowParams{
+		ID:        uuid.New(),
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		UserID:    currentUser.ID,
+		FeedID:    feed.ID})
+	if err != nil {
+		return err
+	}
+	fmt.Println(feedFollow.UserName, "is now following", feedFollow.FeedName)
+	return nil
+}
+
+func handlerFollows(s *state.State, _ Command) error {
+	currentUser, err := s.Db.GetUser(context.Background(), s.Config.CurrentUser)
+	if err != nil {
+		return err
+	}
+	feedFollows, err := s.Db.GetFeedFollowsForUser(context.Background(), currentUser.ID)
+	if err != nil {
+		return err
+	}
+	fmt.Println(currentUser.Name, "is following:")
+	for _, f := range feedFollows {
+		fmt.Println("\t", f.FeedName)
 	}
 	return nil
 }
