@@ -38,6 +38,7 @@ func (c *CommandSet) RegisterBuiltIns() {
 	c.register("feeds", handlerFeeds)
 	c.register("follow", withUserLoggedIn(handlerFollow))
 	c.register("following", withUserLoggedIn(handlerFollows))
+	c.register("unfollow", withUserLoggedIn(handlerUnfollow))
 }
 
 func (c *CommandSet) Run(s *state.State, cmd Command) error {
@@ -50,6 +51,16 @@ func (c *CommandSet) Run(s *state.State, cmd Command) error {
 
 func (c *CommandSet) register(name string, f func(*state.State, Command) error) {
 	c.Commands[name] = f
+}
+
+func withUserLoggedIn(handler func(s *state.State, cmd Command, user database.User) error) func(*state.State, Command) error {
+	return func(s *state.State, cmd Command) error {
+		currentUser, err := s.Db.GetUser(context.Background(), s.Config.CurrentUser)
+		if err != nil {
+			return err
+		}
+		return handler(s, cmd, currentUser)
+	}
 }
 
 func handlerLogin(s *state.State, cmd Command) error {
@@ -193,12 +204,21 @@ func handlerFollows(s *state.State, _ Command, currentUser database.User) error 
 	return nil
 }
 
-func withUserLoggedIn(handler func(s *state.State, cmd Command, user database.User) error) func(*state.State, Command) error {
-	return func(s *state.State, cmd Command) error {
-		currentUser, err := s.Db.GetUser(context.Background(), s.Config.CurrentUser)
-		if err != nil {
-			return err
-		}
-		return handler(s, cmd, currentUser)
+func handlerUnfollow(s *state.State, cmd Command, currentUser database.User) error {
+	if len(cmd.Args) == 0 {
+		return fmt.Errorf("command needs url!")
 	}
+	url := cmd.Args[0]
+	feed, err := s.Db.GetFeed(context.Background(), url)
+	if err != nil {
+		return err
+	}
+	err = s.Db.DeleteFeedFollowForUser(context.Background(), database.DeleteFeedFollowForUserParams{
+		UserID: currentUser.ID,
+		FeedID: feed.ID,
+	})
+	if err != nil {
+		return err
+	}
+	return nil
 }
