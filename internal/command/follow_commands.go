@@ -60,5 +60,6 @@ func handlerUnfollow(s *state.State, cmd Command, currentUser database.User) err
 	if err != nil {
 		return err
 	}
+	fmt.Println(currentUser.Name, "unfollowed", feed.Name)
 	return nil
 }
