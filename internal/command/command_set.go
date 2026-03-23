@@ -25,6 +25,7 @@ func (c *CommandSet) RegisterBuiltIns() {
 	c.register("follow", withUserLoggedIn(handlerFollow))
 	c.register("following", withUserLoggedIn(handlerFollows))
 	c.register("unfollow", withUserLoggedIn(handlerUnfollow))
+	c.register("browse", withUserLoggedIn(handlerBrowse))
 }
 
 func (c *CommandSet) Run(s *state.State, cmd Command) error {
