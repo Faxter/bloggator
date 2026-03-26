@@ -23,6 +23,7 @@
 # Run
 ## Register user
 `bloggator register <username>`
+
 `bloggator users`
 
 ## Login
@@ -30,15 +31,19 @@
 
 ## Add RSS feed
 `bloggator addfeed <name> <url>`
+
 `bloggator feeds`
 
 ## Follow a feed
 `bloggator follow <url>`
+
 `bloggator unfollow <url>`
+
 `bloggator following`
 
 ## Scrape posts from feeds you are following
-(command runs indefinately)
+(command runs indefinetely)
+
 `bloggator agg <time_between_lookups>`
 
 ## Browse latest posts collected from feeds
