@@ -10,15 +10,15 @@
 * create database 'bloggator'
 
 ## Config file
-* create '.gatorconfig.json' in your home directory
-* insert '{"db_url":"postgres://<dbuser>:postgres@localhost:5432/bloggator?sslmode=disable"}'
+* create `.gatorconfig.json` in your home directory
+* insert `{"db_url":"postgres://<dbuser>:postgres@localhost:5432/bloggator?sslmode=disable"}`
 * replace <dbuser> with your postgres user name
 * replace ip address and port number if your setup differs from this
 
 ## Dependencies
-* run 'sqlc generate'
-* run 'go install' in root directory
-* run 'go build' to create executable 'bloggator'
+* run `sqlc generate`
+* run `go install` in root directory
+* run `go build` to create executable 'bloggator'
 
 # Run
 ## Register user
